@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ card.title }}</title>
+
+  <!-- HTMX CDN -->
+  <script src="https://unpkg.com/htmx.org@1.9.3"></script>
+
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .news-card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 24px;
+      max-width: 640px;
+      width: 100%;
+      transition: transform 0.2s ease;
+    }
+
+    .news-card:hover {
+      transform: scale(1.01);
+    }
+
+    .news-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .news-card p {
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .vote-buttons {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .upvote {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .upvote:hover {
+      background-color: #218838;
+    }
+
+    .downvote {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .downvote:hover {
+      background-color: #c82333;
+    }
+
+    #vote-count {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+
+  <form style="display: none;">{% csrf_token %}</form>
+
+  <div class="news-card">
+    <h2>{{ card.title }}</h2>
+    <p>{{ card.content }}</p>
+    <div class="vote-buttons">
+      <button class="upvote" hx-post="{% url 'vote' card.id 'upvote' %}" hx-target="#vote-count" hx-swap="outerHTML">
+        👍 Upvote
+      </button>
+
+      <button class="downvote" hx-post="{% url 'vote' card.id 'downvote' %}" hx-target="#vote-count"
+        hx-swap="outerHTML">
+        👎 Downvote
+      </button>
+
+      <span id="vote-count">{{ card.votes }}</span>
+    </div>
+  </div>
+
+  <script>
+    document.body.addEventListener('htmx:configRequest', (event) => {
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      event.detail.headers['X-CSRFToken'] = csrfToken;
+    });
+  </script>
+
+</body>
+
+</html>
